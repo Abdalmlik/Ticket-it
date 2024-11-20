@@ -7,7 +7,7 @@ def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'your_secret_key'
     app.config['SQLALCHEMY_DATABASE_URI'] = (
-        'mssql+pyodbc://@localhost/Ticket_it?driver=ODBC+Driver+17+for+SQL+Server'
+        "mssql+pyodbc://@ahesham-pc\AHESHAM/Ticket_it?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
     )
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
