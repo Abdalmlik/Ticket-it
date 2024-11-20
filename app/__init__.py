@@ -6,10 +6,11 @@ db = SQLAlchemy()
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'your_secret_key'  # Replace with a strong key
+    ### i did some modifcation below
+    ### app.config['SECRET_KEY'] = 'your_secret_key'  # Replace with a strong key
     app.config['SQLALCHEMY_DATABASE_URI'] = (
-        'mssql+pyodbc://username:password@server_name/database_name?driver=ODBC+Driver+17+for+SQL+Server'
-    )
+    "mssql+pyodbc://@localhost/Ticket_it?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
+)
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.init_app(app)
