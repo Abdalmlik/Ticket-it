@@ -1,0 +1,25 @@
+<!-- templates/update_ticket.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Ticket</title>
+</head>
+<body>
+    <h2>Update Ticket Status</h2>
+    <form method="POST" action="{{ url_for('update_ticket', ticket_id=ticket.TicketID) }}">
+        <label for="status">Status:</label>
+        <select name="status">
+            <option value="Open" {% if ticket.Status == 'Open' %}selected{% endif %}>Open</option>
+            <option value="In Progress" {% if ticket.Status == 'In Progress' %}selected{% endif %}>In Progress</option>
+            <option value="Closed" {% if ticket.Status == 'Closed' %}selected{% endif %}>Closed</option>
+        </select>
+        <br><br>
+        
+        <button type="submit">Update Status</button>
+    </form>
+    
+    <a href="{{ url_for('view_ticket', ticket_id=ticket.TicketID) }}">Back to Ticket</a>
+</body>
+</html>

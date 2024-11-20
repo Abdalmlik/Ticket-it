@@ -54,3 +54,6 @@ CREATE TABLE Reports (
     GeneratedAt DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (GeneratedBy) REFERENCES Users(UserID)
 );
+USE Ticket_it;
+GO
+ALTER AUTHORIZATION ON DATABASE::Ticket_it TO [ETTC\Abdalmalek.Hesham];

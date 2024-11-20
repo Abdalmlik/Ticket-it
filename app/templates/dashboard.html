@@ -1,0 +1,25 @@
+<!-- templates/dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h2>Welcome to your Dashboard</h2>
+    
+    <a href="{{ url_for('create_ticket') }}">Create a New Ticket</a>
+    
+    <h3>Your Tickets</h3>
+    <ul>
+        {% for ticket in tickets %}
+            <li>
+                <a href="{{ url_for('view_ticket', ticket_id=ticket.TicketID) }}">{{ ticket.Title }}</a> - {{ ticket.Status }}
+            </li>
+        {% endfor %}
+    </ul>
+    
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>

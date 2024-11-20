@@ -1,0 +1,33 @@
+<!-- templates/view_ticket.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Ticket</title>
+</head>
+<body>
+    <h2>Ticket Details</h2>
+    
+    <p><strong>Title:</strong> {{ ticket.Title }}</p>
+    <p><strong>Description:</strong> {{ ticket.Description }}</p>
+    <p><strong>Category:</strong> {{ ticket.Category }}</p>
+    <p><strong>Priority:</strong> {{ ticket.Priority }}</p>
+    <p><strong>Status:</strong> {{ ticket.Status }}</p>
+    <p><strong>Created At:</strong> {{ ticket.CreatedAt }}</p>
+    
+    <h3>Activity Log:</h3>
+    <ul>
+        {% for log in ticket.activity_logs %}
+            <li>{{ log.Timestamp }} - {{ log.Action }} by User {{ log.PerformedBy }}</li>
+        {% endfor %}
+    </ul>
+    
+    <a href="{{ url_for('update_ticket', ticket_id=ticket.TicketID) }}">Update Ticket</a>
+    <form method="POST" action="{{ url_for('delete_ticket', ticket_id=ticket.TicketID) }}">
+        <button type="submit">Delete Ticket</button>
+    </form>
+    
+    <a href="{{ url_for('dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
