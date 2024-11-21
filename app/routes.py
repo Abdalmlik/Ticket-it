@@ -3,7 +3,13 @@ from flask_bcrypt import Bcrypt
 from app.models import db, User, Ticket, ActivityLog
 from datetime import datetime
 
+# Initialize bcrypt for password hashing
 bcrypt = Bcrypt()
+
+# Import the app object
+from app import create_app
+
+app = create_app()
 
 # Home Route
 @app.route('/')
