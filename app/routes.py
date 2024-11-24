@@ -2,19 +2,9 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_bcrypt import Bcrypt
 from app.models import db, User, Ticket, ActivityLog
 from datetime import datetime
+from sqlalchemy import or_
 
-# Define a Blueprint
-bp = Blueprint('routes', __name__)
-bcrypt = Bcrypt()
-
-# Home Route
-@bp.route('/')
-def index():
-    if 'user_id' in session:
-        return redirect(url_for('routes.dashboard'))
-    return render_template('login.html')
-
-# Define a Blueprint
+# Define a Blueprint for routes
 bp = Blueprint('routes', __name__)
 bcrypt = Bcrypt()
 
@@ -55,7 +45,12 @@ def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('routes.login'))
 
-    return render_template('dashboard.html')
+    # Fetch tickets created or assigned to the logged-in user
+    tickets = Ticket.query.filter(
+        or_(Ticket.CreatedBy == session['user_id'], Ticket.AssignedTo == session['user_id'])
+    ).all()
+
+    return render_template('dashboard.html', tickets=tickets)
 
 # Register Route (to create a user)
 @bp.route('/register', methods=['GET', 'POST'])
@@ -84,4 +79,77 @@ def register():
 
     return render_template('register.html')
 
-# Other routes (create_ticket, view_ticket, update_ticket, delete_ticket) follow the same structure...
+# Create Ticket Route
+@bp.route('/create_ticket', methods=['GET', 'POST'])
+def create_ticket():
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+
+    if request.method == 'POST':
+        title = request.form['title']
+        description = request.form['description']
+        status = 'Open'
+        user_id = session['user_id']
+
+        # Create a new ticket
+        new_ticket = Ticket(Title=title, Description=description, Status=status, UserID=user_id, CreatedAt=datetime.utcnow())
+        db.session.add(new_ticket)
+        db.session.commit()
+
+        flash('Ticket created successfully!', 'success')
+        return redirect(url_for('routes.dashboard'))
+
+    return render_template('create_ticket.html')
+
+# View Ticket Route (view details of a specific ticket)
+@bp.route('/ticket/<int:ticket_id>')
+def view_ticket(ticket_id):
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+
+    ticket = Ticket.query.get_or_404(ticket_id)
+    if ticket.UserID != session['user_id']:
+        flash('You do not have permission to view this ticket.', 'danger')
+        return redirect(url_for('routes.dashboard'))
+
+    return render_template('view_ticket.html', ticket=ticket)
+
+# Update Ticket Route
+@bp.route('/update_ticket/<int:ticket_id>', methods=['GET', 'POST'])
+def update_ticket(ticket_id):
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+
+    ticket = Ticket.query.get_or_404(ticket_id)
+    if ticket.UserID != session['user_id']:
+        flash('You do not have permission to update this ticket.', 'danger')
+        return redirect(url_for('routes.dashboard'))
+
+    if request.method == 'POST':
+        ticket.Title = request.form['title']
+        ticket.Description = request.form['description']
+        ticket.Status = request.form['status']  # You can add options like 'Open', 'In Progress', 'Closed'
+        db.session.commit()
+
+        flash('Ticket updated successfully!', 'success')
+        return redirect(url_for('routes.view_ticket', ticket_id=ticket_id))
+
+    return render_template('update_ticket.html', ticket=ticket)
+
+# Delete Ticket Route
+@bp.route('/delete_ticket/<int:ticket_id>', methods=['POST'])
+def delete_ticket(ticket_id):
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+
+    ticket = Ticket.query.get_or_404(ticket_id)
+    if ticket.UserID != session['user_id']:
+        flash('You do not have permission to delete this ticket.', 'danger')
+        return redirect(url_for('routes.dashboard'))
+
+    db.session.delete(ticket)
+    db.session.commit()
+
+    flash('Ticket deleted successfully!', 'success')
+    return redirect(url_for('routes.dashboard'))
+

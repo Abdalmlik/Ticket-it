@@ -3,40 +3,7 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
-<h1 class="text-center">Welcome to your Dashboard</h1>
-<div class="mt-4">
-    <a href="{{ url_for('routes.create_ticket') }}" class="btn btn-success mb-3">Create New Ticket</a>
-    {% if tickets %}
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Title</th>
-                <th>Category</th>
-                <th>Priority</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for ticket in tickets %}
-            <tr>
-                <td>{{ ticket.TicketID }}</td>
-                <td>{{ ticket.Title }}</td>
-                <td>{{ ticket.Category }}</td>
-                <td>{{ ticket.Priority }}</td>
-                <td>
-                    <a href="{{ url_for('routes.view_ticket', ticket_id=ticket.TicketID) }}" class="btn btn-info btn-sm">View</a>
-                    <a href="{{ url_for('routes.update_ticket', ticket_id=ticket.TicketID) }}" class="btn btn-warning btn-sm">Update</a>
-                    <form action="{{ url_for('routes.delete_ticket', ticket_id=ticket.TicketID) }}" method="POST" class="d-inline">
-                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {% else %}
-    <p>No tickets found. Click "Create New Ticket" to get started!</p>
-    {% endif %}
-</div>
+<h2>Dashboard</h2>
+<a href="{{ url_for('routes.dashboard') }}">Dashboard</a>
+<p>Welcome to your dashboard. Here you can manage your tickets.</p>
 {% endblock %}
