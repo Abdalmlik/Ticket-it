@@ -17,11 +17,17 @@ class Ticket(db.Model):
     Category = db.Column(db.String(50), nullable=False)
     Priority = db.Column(db.String(50), default='Low')
     Status = db.Column(db.String(50), default='Open')
+    
+    # Reference to the user who created the ticket
     CreatedBy = db.Column(db.Integer, db.ForeignKey('Users.UserID'), nullable=False)
+    
+    # Reference to the user assigned to the ticket
     AssignedTo = db.Column(db.Integer, db.ForeignKey('Users.UserID'), nullable=True)
+    
     CreatedAt = db.Column(db.DateTime, default=db.func.current_timestamp())
     UpdatedAt = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
 
+    # Relationships
     creator = db.relationship('User', foreign_keys=[CreatedBy], backref='created_tickets')
     assignee = db.relationship('User', foreign_keys=[AssignedTo], backref='assigned_tickets')
 

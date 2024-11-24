@@ -82,44 +82,22 @@ def register():
 # Create Ticket Route
 @bp.route('/create_ticket', methods=['GET', 'POST'])
 def create_ticket():
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
-        category = request.form['category']
-        priority = request.form['priority']
-        status = request.form['status']
+        status = 'Open'
+        user_id = session['user_id']
 
-        # Get the ID of the logged-in user (assumes you use Flask-Login)
-        created_by = current_user.UserID  # Flask-Login's current_user is assumed
-
-        # Validate Category
-        valid_categories = ['Hardware', 'Software', 'Network', 'Other']
-        if category not in valid_categories:
-            flash('Invalid category. Please choose one of the valid categories: Hardware, Software, Network, or Other.', 'danger')
-            return redirect(url_for('routes.create_ticket'))  # Return to the ticket creation page
-
-        # Validate Priority
-        valid_priorities = ['Low', 'Medium', 'High']
-        if priority not in valid_priorities:
-            flash('Invalid priority. Please choose one of the valid priorities: Low, Medium, or High.', 'danger')
-            return redirect(url_for('routes.create_ticket'))  # Return to the ticket creation page
-
-        # Create a new Ticket instance
-        new_ticket = Ticket(
-            Title=title,
-            Description=description,
-            Category=category,   # Validated category
-            Priority=priority,   # Validated priority
-            Status=status,
-            CreatedBy=created_by,
-        )
-
-        # Add to session and commit
+        # Create a new ticket
+        new_ticket = Ticket(Title=title, Description=description, Status=status, UserID=user_id, CreatedAt=datetime.utcnow())
         db.session.add(new_ticket)
         db.session.commit()
 
         flash('Ticket created successfully!', 'success')
-        return redirect(url_for('routes.view_tickets'))
+        return redirect(url_for('routes.dashboard'))
 
     return render_template('create_ticket.html')
 
