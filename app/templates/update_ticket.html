@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Update Ticket{% endblock %}
+
+{% block content %}
+<h1 class="text-center">Update Ticket</h1>
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <form method="POST" action="{{ url_for('routes.update_ticket', ticket_id=ticket.TicketID) }}">
+            <div class="mb-3">
+                <label for="status" class="form-label">Status</label>
+                <select name="status" id="status" class="form-select">
+                    <option value="Open" {% if ticket.Status == "Open" %}selected{% endif %}>Open</option>
+                    <option value="In Progress" {% if ticket.Status == "In Progress" %}selected{% endif %}>In Progress</option>
+                    <option value="Closed" {% if ticket.Status == "Closed" %}selected{% endif %}>Closed</option>
+                </select>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-warning">Update</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

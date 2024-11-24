@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}View Ticket{% endblock %}
+
+{% block content %}
+<h1 class="text-center">Ticket Details</h1>
+<div class="card">
+    <div class="card-header">
+        <h4>{{ ticket.Title }}</h4>
+    </div>
+    <div class="card-body">
+        <p><strong>Description:</strong> {{ ticket.Description }}</p>
+        <p><strong>Category:</strong> {{ ticket.Category }}</p>
+        <p><strong>Priority:</strong> {{ ticket.Priority }}</p>
+        <p><strong>Status:</strong> {{ ticket.Status }}</p>
+    </div>
+</div>
+<a href="{{ url_for('routes.dashboard') }}" class="btn btn-secondary mt-3">Back to Dashboard</a>
+{% endblock %}
