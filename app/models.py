@@ -1,12 +1,17 @@
 from . import db
+from flask_login import UserMixin
 
-class User(db.Model):
+
+class User(db.Model, UserMixin):  # Add UserMixin for Flask-Login support
     __tablename__ = 'Users'
     UserID = db.Column(db.Integer, primary_key=True)
     Name = db.Column(db.String(100), nullable=False)
     Email = db.Column(db.String(150), unique=True, nullable=False)
     PasswordHash = db.Column(db.String(255), nullable=False)
     Role = db.Column(db.String(50), nullable=False)
+
+    # Flask-Login methods are inherited from UserMixin
+
 
 class Ticket(db.Model):
     __tablename__ = 'Tickets'
@@ -28,6 +33,7 @@ class Ticket(db.Model):
     def __repr__(self):
         return f"<Ticket {self.TicketID}: {self.Title}>"
 
+
 class ActivityLog(db.Model):
     __tablename__ = 'ActivityLogs'
     LogID = db.Column(db.Integer, primary_key=True)
@@ -35,6 +41,7 @@ class ActivityLog(db.Model):
     Action = db.Column(db.String(255), nullable=False)
     PerformedBy = db.Column(db.Integer, db.ForeignKey('Users.UserID'), nullable=False)
     Timestamp = db.Column(db.DateTime, default=db.func.current_timestamp())
+
 
 class Attachment(db.Model):
     __tablename__ = 'Attachments'

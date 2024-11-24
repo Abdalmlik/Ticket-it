@@ -59,7 +59,7 @@ def register():
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
-        role = request.form['role'] or 'User'  # Default role
+        role = request.form.get('role', 'User')  # Default role is 'User'
 
         # Check if email already exists
         if User.query.filter_by(Email=email).first():
@@ -82,36 +82,37 @@ def register():
 # Create Ticket Route
 @bp.route('/create_ticket', methods=['GET', 'POST'])
 def create_ticket():
+    if 'user_id' not in session:
+        return redirect(url_for('routes.login'))
+
     if request.method == 'POST':
         title = request.form['title']
         description = request.form['description']
         category = request.form['category']
         priority = request.form['priority']
-        status = request.form['status']
+        status = request.form.get('status', 'Open')  # Default status is 'Open'
+        created_by = session['user_id']
 
-        # Get the ID of the logged-in user (assumes you use Flask-Login)
-        created_by = current_user.UserID  # Flask-Login's current_user is assumed
-
-        # Validate Category
+        # Validate category
         valid_categories = ['Hardware', 'Software', 'Network', 'Other']
         if category not in valid_categories:
-            flash('Invalid category. Please choose one of the valid categories: Hardware, Software, Network, or Other.', 'danger')
-            return redirect(url_for('routes.create_ticket'))  # Return to the ticket creation page
+            flash('Invalid category. Choose from Hardware, Software, Network, or Other.', 'danger')
+            return redirect(url_for('routes.create_ticket'))
 
-        # Validate Priority
+        # Validate priority
         valid_priorities = ['Low', 'Medium', 'High']
         if priority not in valid_priorities:
-            flash('Invalid priority. Please choose one of the valid priorities: Low, Medium, or High.', 'danger')
-            return redirect(url_for('routes.create_ticket'))  # Return to the ticket creation page
+            flash('Invalid priority. Choose from Low, Medium, or High.', 'danger')
+            return redirect(url_for('routes.create_ticket'))
 
         # Create a new Ticket instance
         new_ticket = Ticket(
             Title=title,
             Description=description,
-            Category=category,   # Validated category
-            Priority=priority,   # Validated priority
+            Category=category,
+            Priority=priority,
             Status=status,
-            CreatedBy=created_by,
+            CreatedBy=created_by
         )
 
         # Add to session and commit
@@ -119,18 +120,20 @@ def create_ticket():
         db.session.commit()
 
         flash('Ticket created successfully!', 'success')
-        return redirect(url_for('routes.view_tickets'))
+        return redirect(url_for('routes.dashboard'))
 
     return render_template('create_ticket.html')
 
-# View Ticket Route (view details of a specific ticket)
+# View Ticket Route
 @bp.route('/ticket/<int:ticket_id>')
 def view_ticket(ticket_id):
     if 'user_id' not in session:
         return redirect(url_for('routes.login'))
 
     ticket = Ticket.query.get_or_404(ticket_id)
-    if ticket.UserID != session['user_id']:
+
+    # Allow viewing only if the user is the creator or assigned user
+    if ticket.CreatedBy != session['user_id'] and ticket.AssignedTo != session['user_id']:
         flash('You do not have permission to view this ticket.', 'danger')
         return redirect(url_for('routes.dashboard'))
 
@@ -143,14 +146,16 @@ def update_ticket(ticket_id):
         return redirect(url_for('routes.login'))
 
     ticket = Ticket.query.get_or_404(ticket_id)
-    if ticket.UserID != session['user_id']:
+
+    # Allow updating only if the user is the creator
+    if ticket.CreatedBy != session['user_id']:
         flash('You do not have permission to update this ticket.', 'danger')
         return redirect(url_for('routes.dashboard'))
 
     if request.method == 'POST':
         ticket.Title = request.form['title']
         ticket.Description = request.form['description']
-        ticket.Status = request.form['status']  # You can add options like 'Open', 'In Progress', 'Closed'
+        ticket.Status = request.form['status']
         db.session.commit()
 
         flash('Ticket updated successfully!', 'success')
@@ -165,7 +170,9 @@ def delete_ticket(ticket_id):
         return redirect(url_for('routes.login'))
 
     ticket = Ticket.query.get_or_404(ticket_id)
-    if ticket.UserID != session['user_id']:
+
+    # Allow deletion only if the user is the creator
+    if ticket.CreatedBy != session['user_id']:
         flash('You do not have permission to delete this ticket.', 'danger')
         return redirect(url_for('routes.dashboard'))
 
@@ -174,4 +181,3 @@ def delete_ticket(ticket_id):
 
     flash('Ticket deleted successfully!', 'success')
     return redirect(url_for('routes.dashboard'))
-
