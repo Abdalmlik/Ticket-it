@@ -8,8 +8,8 @@ from sqlalchemy import or_
 bp = Blueprint('routes', __name__)
 bcrypt = Bcrypt()
 
-# Home Route
-@bp.route('/')
+# Home Route 
+@bp.route('/')  # Flask checks if the user is logged in by validating the session
 def index():
     if 'user_id' in session:
         return redirect(url_for('routes.dashboard'))
@@ -40,7 +40,7 @@ def logout():
     return redirect(url_for('routes.login'))
 
 # Dashboard Route
-@bp.route('/dashboard')
+@bp.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('routes.login'))
@@ -57,6 +57,21 @@ def dashboard():
         tickets = Ticket.query.filter(
             or_(Ticket.CreatedBy == user_id, Ticket.AssignedTo == user_id)
         ).all()
+
+    # Handle ticket assignment (POST request)
+    if request.method == 'POST':
+        ticket_id = request.form['ticket_id']
+        support_agent_id = request.form['support_agent']
+
+        # Find the ticket
+        ticket = Ticket.query.get(ticket_id)
+        if ticket:
+            # Update the AssignedTo field
+            ticket.AssignedTo = support_agent_id
+            db.session.commit()
+            flash('Ticket assigned successfully!', 'success')
+        else:
+            flash('Ticket not found.', 'danger')
 
     return render_template('dashboard.html', tickets=tickets, role=user_role)
 

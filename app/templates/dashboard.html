@@ -57,7 +57,7 @@
 <table>
     <thead>
         <tr>
-            <th>ID</th>
+            <th>Ticket ID</th>
             <th>Title</th>
             <th>Status</th>
             <th>Created By</th>
@@ -70,11 +70,12 @@
     <tbody>
         {% for ticket in tickets %}
         <tr>
-            <td>{{ ticket.id }}</td>
-            <td>{{ ticket.title }}</td>
-            <td>{{ ticket.status }}</td>
-            <td>{{ ticket.CreatedBy }}</td>
-            <td>{{ ticket.AssignedTo }}</td>
+            <td>{{ ticket.TicketID }}</td>
+            <td>{{ ticket.Title }}</td>
+            <td>{{ ticket.Status }}</td>
+            <td>{{ ticket.CreatedBy}}</td>  <!-- Assuming creator is a User object -->
+            <td>{{ ticket.AssignedTo if ticket.assignee else 'Not Assigned' }}</td>  <!-- If assigned, show name, else 'Not Assigned' -->
+
             {% if role == 'admin' %}
             <td>
                 <form method="POST" action="{{ url_for('routes.dashboard') }}">

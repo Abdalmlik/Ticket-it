@@ -1,5 +1,6 @@
 from . import db
 from flask_login import UserMixin
+from sqlalchemy import Enum
 
 
 class User(db.Model, UserMixin):  # Add UserMixin for Flask-Login support
@@ -19,8 +20,8 @@ class Ticket(db.Model):
     TicketID = db.Column(db.Integer, primary_key=True)
     Title = db.Column(db.String(255), nullable=False)
     Description = db.Column(db.Text, nullable=False)
-    Category = db.Column(db.String(50), nullable=False)
-    Priority = db.Column(db.String(50), default='Low')
+    Category = db.Column(Enum('Hardware', 'Software', 'Network', 'Other', name='category_enum'), nullable=False)
+    Priority = db.Column(Enum('Low', 'Medium', 'High', name='priority_enum'), default='Low')
     Status = db.Column(db.String(50), default='Open')
     CreatedBy = db.Column(db.Integer, db.ForeignKey('Users.UserID'), nullable=False)
     AssignedTo = db.Column(db.Integer, db.ForeignKey('Users.UserID'), nullable=True)

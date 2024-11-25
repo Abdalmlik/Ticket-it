@@ -1,0 +1,16 @@
+Replace Database Details
+Update this line in the code:
+
+python
+Copy code
+'mssql+pyodbc://username:password@server_name/database_name?driver=ODBC+Driver+17+for+SQL+Server'
+Replace:
+username: Your MSSQL username (e.g., sa).
+password: Your MSSQL password.
+server_name: The server name, e.g., localhost or 127.0.0.1.
+database_name: The name of your database.
+
+mssql+pyodbc://username:password@server_name/Ticket_it?driver=ODBC+Driver+17+for+SQL+Server
+
+
+app.config['SQLALCHEMY_DATABASE_URI'] = "mssql+pyodbc://ahesham-pc\\AHESHAM/Ticket_it?driver=ODBC+Driver+17+for+SQL+Server&trusted_connection=yes"
