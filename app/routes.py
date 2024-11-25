@@ -45,12 +45,20 @@ def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('routes.login'))
 
-    # Fetch tickets created or assigned to the logged-in user
-    tickets = Ticket.query.filter(
-        or_(Ticket.CreatedBy == session['user_id'], Ticket.AssignedTo == session['user_id'])
-    ).all()
+    # Check the user's role from the session
+    user_role = session.get('role')  # Assumes you store 'role' in the session
+    user_id = session.get('user_id')
 
-    return render_template('dashboard.html', tickets=tickets)
+    if user_role == 'admin':
+        # Admins can see all tickets
+        tickets = Ticket.query.all()
+    else:
+        # Regular users can only see tickets they created or are assigned to
+        tickets = Ticket.query.filter(
+            or_(Ticket.CreatedBy == user_id, Ticket.AssignedTo == user_id)
+        ).all()
+
+    return render_template('dashboard.html', tickets=tickets, role=user_role)
 
 # Register Route (to create a user)
 @bp.route('/register', methods=['GET', 'POST'])
@@ -59,7 +67,7 @@ def register():
         name = request.form['name']
         email = request.form['email']
         password = request.form['password']
-        role = request.form.get('role', 'User')  # Default role is 'User'
+        role = request.form.get('role', 'Regular User')  # Default role is 'User'
 
         # Check if email already exists
         if User.query.filter_by(Email=email).first():
